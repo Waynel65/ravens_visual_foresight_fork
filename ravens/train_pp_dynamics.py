@@ -68,11 +68,11 @@ def main(unused_argv):
     for i in range(len(task_list)):
       max_demos = dataset.n_episodes_list[i]
       assert max_demos >= FLAGS.n_demos
-      episodes = np.random.choice(range(max_demos), FLAGS.n_demos, False)
+      episodes = np.random.choice(range(max_demos), FLAGS.n_demos, False) # choose n_demos number of unique demos (each demo has a numbering)
       dataset.set(i, episodes)
     
     # Train agent and save snapshots.
-    while trainer.total_steps < FLAGS.n_steps:
+    while trainer.total_steps < FLAGS.n_steps: # n_steps by default is 60K
       trainer.train_pp(dataset, writer=writer, debug=FLAGS.debug)
 
       if trainer.total_steps % FLAGS.interval == 0:

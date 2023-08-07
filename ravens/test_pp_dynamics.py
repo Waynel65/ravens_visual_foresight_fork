@@ -53,7 +53,7 @@ def main(unused_argv):
   
   # Load test dataset.
   dataset_list = [os.path.join(FLAGS.data_dir, f'{task}-mcts-pp-test') for task in tasks]
-  dataset = DatasetPPDynamics(dataset_list)
+  dataset = DatasetPPDynamics(dataset_list) # loading the test dataset (the demos)
 
   for train_run in range(FLAGS.n_runs):
     # Model path.

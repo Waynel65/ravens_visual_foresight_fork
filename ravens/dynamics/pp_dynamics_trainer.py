@@ -13,19 +13,21 @@ import matplotlib.pyplot as plt
 
 
 class PPDynamicsTrainer:
-  """Class for training the PP dynamics."""
+  """Class for training the PP (pick-and-place) dynamics."""
+  """This MIGHT BE the trainer for VF model """
 
   def __init__(self, model_name, repeat_H_lambda=5, h_only=False):
     """Constructor.
 
     Args:
       model_name: name of the model
+      intializes the trainer with the model name
       repeat_H_lambda: weight for the height channel in the L2 loss
       h_only: flag of training only H
     """
 
     self.total_steps = 0
-    self.mask_size = 44
+    self.mask_size = 44 # a hyper-parameter set for radius of the pos area of pickup mask
     self.h_only = h_only
 
     self.repeat_H_lambda = repeat_H_lambda
@@ -50,6 +52,12 @@ class PPDynamicsTrainer:
 
   def get_rgbh_from_obs(self, obs):
     """Get RBGH reconctructed from observations."""
+    
+    """
+      wayne:
+      This method takes an observation 
+      and returns a 4-channel image consisting of the RGB color channels and a height channel.
+    """
 
     cmap, hmap = utils.get_fused_heightmap(
         obs, self.cam_config, self.bounds, self.pix_size)
@@ -63,14 +71,22 @@ class PPDynamicsTrainer:
 
   def get_sample_pp(self, dataset, augment=True):
     """Get a sample from ravens.DatasetPPDynamics."""
+    """
+      These methods sample a PP action and its outcome from the dataset.
+      The action is represented by the initial and target images and the pick and place positions and orientations. 
+      The methods also handle data augmentation by perturbing the pick and place positions.
+    """
 
     # Get a sample from the dataset.
     # (_, init_obs, act, _, _), (_, target_obs, _, _, _) = dataset.sample(cache=True)
+
+    # VF model takes in the current obs and an action, predicts a target observation
     (init_obs, act, _, _), (target_obs, _, _, _) = dataset.sample()
     init_img = self.get_rgbh_from_obs(init_obs)
     target_img = self.get_rgbh_from_obs(target_obs)
 
     # Get the action.
+    # wayne: im assuming p0 is pick and p1 is place action
     p0_xyz, p0_xyzw = act['pose0']
     p1_xyz, p1_xyzw = act['pose1']
     p0 = utils.xyz_to_pix(p0_xyz, self.bounds, self.pix_size)
@@ -78,7 +94,7 @@ class PPDynamicsTrainer:
     p0_theta = -np.float32(utils.quatXYZW_to_eulerXYZ(p0_xyzw)[2])
     p1_theta = -np.float32(utils.quatXYZW_to_eulerXYZ(p1_xyzw)[2])
     assert p0_theta == 0.0
-    p1_theta = p1_theta - p0_theta
+    p1_theta = p1_theta - p0_theta # the delta-theta in the paper
 
     # Check the actions are in bound.
     if not self.action_in_bound(p0):
@@ -107,6 +123,7 @@ class PPDynamicsTrainer:
 
   def get_sample_pp_real(self, dataset, augment=True):
     """Get a sample from ravens.DatasetPPDynamicsReal."""
+    """This is for real environment """
 
     # Get a sample from the dataset.
     (init_cmap, init_hmap, act), (target_cmap, target_hmap, _) = dataset.sample()
@@ -158,6 +175,9 @@ class PPDynamicsTrainer:
 
   @staticmethod
   def preprocess(cmap, hmap):
+    """
+      this is for real-life experiment pre-processing
+    """
     hmap_temp = np.copy(hmap)
     hmap_means = np.mean(hmap_temp)
     hmap_temp = hmap_temp * (hmap_temp > 1.2 * hmap_means)
@@ -226,6 +246,8 @@ class PPDynamicsTrainer:
       plt.show()
 
     # Get training loss.
+    # this is the part that actually defines the architecture of the model
+    # and how the input is forwarded in the network
     step = self.total_steps + 1
     loss = self.dynamics.train_pp(
         init_img,
@@ -257,7 +279,7 @@ class PPDynamicsTrainer:
       total_dataset_rgb_loss = 0.0
       total_dataset_height_loss = 0.0
       test_dataset_transition_num = 0
-      for episode_id in range(episode_num):
+      for episode_id in range(episode_num): # for 20 demos
         if real:
           episode  = dataset.load(dataset_id, episode_id)
         else:

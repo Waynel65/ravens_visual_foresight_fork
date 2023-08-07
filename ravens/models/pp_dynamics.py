@@ -41,6 +41,7 @@ class PPDynamics(object):
 
   def train_pp(self, init_img, target_img, p0, p1, p1_theta, backprop=True, repeat_H_lambda=1, h_only=False):
     """Train the PP dynamics."""
+    """The actual training part of the VF model """
 
     self.metric.reset_states()
 
@@ -106,22 +107,29 @@ class PPDynamics(object):
     """Forward pass."""
 
     # Pick mask.
+    # a mask that is positive around the center but zero elsewhere
     init_shape = init_img.shape
-    pick_mask = np.zeros((init_shape[0], init_shape[1]))
+    pick_mask = np.zeros((init_shape[0], init_shape[1])) 
     pick_mask[p0[0]:(p0[0]+self.mask_size), p0[1]:(p0[1]+self.mask_size)] = 1.0
 
-    # Place mask.
+    # Place mask (to represent T_place)
+    # 1. rorate o_t by delta theta
+    # 2. the rotated obs is then cropped with a square of the same size as the mask
+    # 3. the cropped image is pasted on a zero image at p_place to create M_place
+    # 4. the FCN takes the concatenated image of M_pick, o_t and M_place
     init_tens = tf.convert_to_tensor(init_img, dtype=tf.float32)
     pivot = np.array([p0[1], p0[0]]) + self.pad_size
-    rmat = utils.get_image_transform(p1_theta, (0, 0), pivot)
+    rmat = utils.get_image_transform(p1_theta, (0, 0), pivot) # this doesn't use tf
     rvec = rmat.reshape(-1)[:-1]
     init_tens_rot = tfa_image.transform(init_tens, rvec, interpolation='NEAREST')
+
     crop = init_tens_rot[p0[0]:(p0[0] + self.mask_size),
                          p0[1]:(p0[1] + self.mask_size), :]
-    place_mask = np.zeros(init_shape)
+    place_mask = np.zeros(init_shape) 
     place_mask[p1[0]:(p1[0]+self.mask_size), p1[1]:(p1[1]+self.mask_size), :] = crop.numpy()
 
     # Concateante init_img, pick_mask, and place_mask.
+    # this in_img will be the input into the network
     in_img = np.concatenate([init_img, pick_mask[Ellipsis, None], place_mask], axis=-1)
 
     # Debug paper

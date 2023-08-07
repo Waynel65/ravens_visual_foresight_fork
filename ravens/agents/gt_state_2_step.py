@@ -35,7 +35,7 @@ class GtState2StepAgent(GtStateAgent):
     # Set up model.
     self.pick_model = None
     self.place_model = None
-
+    # self.total_iter = 0
     self.pick_optim = tf.keras.optimizers.Adam(learning_rate=2e-4)
     self.place_optim = tf.keras.optimizers.Adam(learning_rate=2e-4)
     self.metric = tf.keras.metrics.Mean(name='metric')
@@ -110,12 +110,15 @@ class GtState2StepAgent(GtStateAgent):
     @tf.function
     def train_step(pick_model, place_model, batch_obs, batch_act,
                    loss_criterion):
+      # training the pick model here
       with tf.GradientTape() as tape:
         prediction = pick_model(batch_obs)
         loss0 = loss_criterion(batch_act[:, 0:3], prediction)
         grad = tape.gradient(loss0, pick_model.trainable_variables)
         self.pick_optim.apply_gradients(
             zip(grad, pick_model.trainable_variables))
+
+      # training the place model here
       with tf.GradientTape() as tape:
         # batch_obs = tf.concat((batch_obs, batch_act[:,0:3] +
         #                        tf.random.normal(shape=batch_act[:,0:3].shape,
