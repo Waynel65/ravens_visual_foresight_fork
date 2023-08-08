@@ -521,7 +521,7 @@ class GoalTransporterAgent(TransporterAgent):
     def __init__(self, name, task, num_rotations=24, h_only=False, models_dir=None):
         # (Oct 26) set attn_no_targ=False, and that should be all we need along w/shape ...
         super().__init__(name, task, num_rotations, use_goal_image=True, attn_no_targ=False, h_only=h_only, models_dir=models_dir)
-
+        print(f"[TRANSPORTER.py] GoalTRansporter is used")
         # (Oct 26) Stack the goal image for the Attention module -- model cannot pick properly otherwise.
         a_shape = (self.input_shape[0], self.input_shape[1], int(self.input_shape[2] * 2))
 
