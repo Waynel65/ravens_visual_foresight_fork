@@ -74,6 +74,7 @@ class Attention:
         for x in in_tens:
             logits += (self.model(x),)
         logits = tf.concat(logits, axis=0)
+        print(f"[DEBUG] logits shape after concat: {logits.shape}")
 
         # Rotate back output
         rvecs = self.get_se2(self.num_rotations, pivot, reverse=True)
