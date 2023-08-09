@@ -63,6 +63,8 @@ class TransportGoal:
         otherwise we have to do a forward pass, then call tf.multiply, then
         do another forward pass, which splits up the computation.
         """
+
+        print(f"[TRANS_goal] img.shape: {img.shape}")
         assert in_img.shape == goal_img.shape, f'{in_img.shape}, {goal_img.shape}'
 
         # input image --> TF tensor
@@ -71,6 +73,7 @@ class TransportGoal:
         input_shape = (1,) + input_data.shape
         input_data = input_data.reshape(input_shape)                    # (1,384,224,6)
         in_tensor = tf.convert_to_tensor(input_data, dtype=tf.float32)  # (1,384,224,6)
+        print(f"[TRANS_goal] in_tensor.shape: {in_tensor.shape}")
 
         # goal image --> TF tensor
         goal_unproc = np.pad(goal_img, self.padding, mode='constant')   # (384,224,6)
@@ -78,14 +81,19 @@ class TransportGoal:
         goal_shape = (1,) + goal_data.shape
         goal_data = goal_data.reshape(goal_shape)                       # (1,384,224,6)
         goal_tensor = tf.convert_to_tensor(goal_data, dtype=tf.float32) # (1,384,224,6)
+        print(f"[TRANS_goal] goal_tensor.shape: {goal_tensor.shape}")
 
         # Get SE2 rotation vectors for cropping.
         pivot = np.array([p[1], p[0]]) + self.pad_size
         rvecs = self.get_se2(self.num_rotations, pivot)
+        print(f"[TRANS_goal] RVECS have a shape of {rvecs.shape}")
 
         # Forward pass through three separate FCNs. All logits will be: (1,384,224,3).
         in_logits, kernel_nocrop_logits, goal_logits = \
                     self.model([in_tensor, in_tensor, goal_tensor])
+        print(f"[TRANS_goal] in_logits have a shape of {in_logits.shape}")
+        print(f"[TRANS_goal] kernel_nocrop_logits have a shape of {kernel_nocrop_logits.shape}")
+        print(f"[TRANS_goal] goal_logits have a shape of {goal_logits.shape}")
 
         # Use features from goal logits and combine with input and kernel.
         goal_x_in_logits     = tf.multiply(goal_logits, in_logits)
@@ -99,6 +107,7 @@ class TransportGoal:
                       p[0]:(p[0] + self.crop_size),
                       p[1]:(p[1] + self.crop_size),
                       :]
+        print(f"[TRANS_GOAL] kernel shape: {kernel.shape} | the rest: {(self.num_rotations, self.crop_size, self.crop_size, self.odim)}")
         assert kernel.shape == (self.num_rotations, self.crop_size, self.crop_size, self.odim)
 
         # Cross-convolve `in_x_goal_logits`. Padding kernel: (24,64,64,3) --> (65,65,3,24).
