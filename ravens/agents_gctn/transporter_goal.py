@@ -161,6 +161,8 @@ class TransporterAgent:
             attention = self.attention_model.forward(input_only)
         else:
             attention = self.attention_model.forward(input_image)
+        print(f"[DEBUG] attention's shape in eval: {attention.shape}")
+        
         argmax = np.argmax(attention)
         argmax = np.unravel_index(argmax, shape=attention.shape)
         p0_pixel = argmax[:2]
