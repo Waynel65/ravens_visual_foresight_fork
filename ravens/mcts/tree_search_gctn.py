@@ -11,6 +11,8 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
+import pdb
+
 
 class BestFirstSearch:
   """Class to perform best first search for visual task planning."""
@@ -241,6 +243,7 @@ class BestFirstSearch:
     # Get the RGBHHH image.
     img = self.get_image(obs)
 
+    pdb.set_trace()
     # Imagine the first step.
     acts_1, next_imgs_1, next_imgs_means_1 = self.expand_img(img, visualize)
 
