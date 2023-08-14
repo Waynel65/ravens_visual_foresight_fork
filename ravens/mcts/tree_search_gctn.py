@@ -106,6 +106,7 @@ class BestFirstSearch:
     input_img = np.copy(img_rgbhhh)
     goal_img = np.copy(self.goal_img_rgbhhh)
     acts = self.agent.get_top_k_acts(self.k, input_img, goal_img)
+    pdb.set_trace()
 
     for i in range(len(acts)):
       next_imgs.append([])
@@ -243,7 +244,7 @@ class BestFirstSearch:
     # Get the RGBHHH image.
     img = self.get_image(obs)
 
-    pdb.set_trace()
+    # pdb.set_trace()
     # Imagine the first step.
     acts_1, next_imgs_1, next_imgs_means_1 = self.expand_img(img, visualize)
 
