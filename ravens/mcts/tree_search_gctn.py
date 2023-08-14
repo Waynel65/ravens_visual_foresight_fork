@@ -244,9 +244,9 @@ class BestFirstSearch:
     # Get the RGBHHH image.
     img = self.get_image(obs)
 
-    # pdb.set_trace()
     # Imagine the first step.
     acts_1, next_imgs_1, next_imgs_means_1 = self.expand_img(img, visualize)
+    pdb.set_trace()
 
     # Imagine the second step.
     acts_2 = []

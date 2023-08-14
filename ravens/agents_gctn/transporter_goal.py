@@ -240,7 +240,7 @@ class TransporterAgent:
                    'pose1': (p1_position, p1_rotation)}
             acts.append(act)
 
-        return acts        
+        return acts   
 
     def act(self, obs, info, debug_imgs=False, goal=None):
         """Run inference and return best action given visual observations.
