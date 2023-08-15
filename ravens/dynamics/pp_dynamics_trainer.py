@@ -11,6 +11,8 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
+import pdb
+
 
 class PPDynamicsTrainer:
   """Class for training the PP (pick-and-place) dynamics."""
@@ -411,7 +413,7 @@ class PPDynamicsTrainer:
       img = img[:, :, 3:4]
     else:
       img = img[:, :, :4]
-    
+    pdb.set_trace()
     out_img = self.dynamics.imagine(
       img, p0, p1, p1_theta, self.h_only)
 
