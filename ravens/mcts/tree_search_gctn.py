@@ -111,7 +111,7 @@ class BestFirstSearch:
     for i in range(len(acts)):
       next_imgs.append([])
     
-    pdb.set_trace()
+    # pdb.set_trace()
     for i in range(len(acts)):
       for j in range(self.num_bootstraps):
         input_img = np.copy(img_rgbhhh)
@@ -247,7 +247,7 @@ class BestFirstSearch:
 
     # Imagine the first step.
     acts_1, next_imgs_1, next_imgs_means_1 = self.expand_img(img, visualize)
-    pdb.set_trace()
+    # pdb.set_trace()
 
     # Imagine the second step.
     acts_2 = []
