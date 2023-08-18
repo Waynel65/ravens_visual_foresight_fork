@@ -163,7 +163,7 @@ class TransporterAgent:
             attention = self.attention_model.forward(input_only)
         else:
             attention = self.attention_model.forward(input_image)
-        print(f"[DEBUG] attention's shape in eval: {attention.shape}")
+        # print(f"[DEBUG] attention's shape in eval: {attention.shape}")
         # pdb.set_trace()
         argmax = np.argmax(attention)
         argmax = np.unravel_index(argmax, shape=attention.shape)
@@ -275,6 +275,7 @@ class TransporterAgent:
             assert input_image.shape[2] == 12, input_image.shape
 
         # Attention model forward pass.
+        pdb.set_trace()
         if self.attn_no_targ and self.use_goal_image:
             maxdim = int(input_image.shape[2] / 2)
             input_only = input_image[:, :, :maxdim]
