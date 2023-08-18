@@ -48,8 +48,11 @@ def main(unused_argv):
     tf.config.experimental.enable_op_determinism()
 
     # Model path.
-    attention_model_path = f'./gctn_models/GCTN-Multi-transporter-goal-{FLAGS.n_demos}-{train_run}-rots-36-fin_g/attention-ckpt-{FLAGS.gctn_total_steps}.h5'
-    transport_model_path = f'./gctn_models/GCTN-Multi-transporter-goal-{FLAGS.n_demos}-{train_run}-rots-36-fin_g/transport-ckpt-{FLAGS.gctn_total_steps}.h5'
+    gctn_total_steps = 20000
+    # attention_model_path = f'./gctn_models/GCTN-Multi-transporter-goal-{FLAGS.n_demos}-{train_run}-rots-36-fin_g/attention-ckpt-{FLAGS.gctn_total_steps}.h5'
+    # transport_model_path = f'./gctn_models/GCTN-Multi-transporter-goal-{FLAGS.n_demos}-{train_run}-rots-36-fin_g/transport-ckpt-{FLAGS.gctn_total_steps}.h5'
+    attention_model_path = f'./gctn_models/attention-ckpt-{gctn_total_steps}.pth'
+    transport_model_path = f'./gctn_models/transport-ckpt-{gctn_total_steps}.pth'
 
     # Initialize agent.
     name = f'GCTN-Multi-{FLAGS.agent}-{FLAGS.n_demos}-{FLAGS.gctn_total_steps}'
