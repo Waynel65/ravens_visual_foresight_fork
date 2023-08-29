@@ -92,54 +92,6 @@ class Attention:
         if apply_softmax:
             output = np.float32(output).reshape(logits.shape[1:])
         return output
-    
-    # def forward(self, in_img, apply_softmax=True):
-    #     """Forward pass.
-
-    #     in_img.shape: (320, 160, 6)
-    #     input_data.shape: (320, 320, 6), then (None, 320, 320, 6)
-    #     """
-    #     print(f"[DEBUG] Original in_img shape: {in_img.shape}")
-        
-    #     input_data = np.pad(in_img, self.padding, mode='constant')
-    #     print(f"[DEBUG] in_data shape after padding: {input_data.shape}")
-
-
-
-    #     input_data = self.preprocess(input_data)
-    #     input_shape = (1,) + input_data.shape
-    #     input_data = input_data.reshape(input_shape)
-    #     in_tens = tf.convert_to_tensor(input_data, dtype=tf.float32)
-
-    #     # Rotate input
-    #     pivot = np.array(input_data.shape[1:3]) / 2
-    #     print(f"[DEBUG] pivot: {pivot}")
-
-    #     rvecs = self.get_se2(self.num_rotations, pivot)
-    #     in_tens = tf.repeat(in_tens, repeats=self.num_rotations, axis=0)
-    #     print(f"[DEBUG] in_tens shape after repeat: {in_tens.shape}")
-
-    #     # ... rest of your code for rotating input, forward pass ...
-
-    #     # Rotate back output
-    #     rvecs = self.get_se2(self.num_rotations, pivot, reverse=True)
-    #     logits = tfa.image.transform(logits, rvecs, interpolation='NEAREST')
-
-    #     c0 = self.padding[:2, 0]
-    #     c1 = c0 + in_img.shape[:2]
-    #     print(f"[DEBUG] c0 value: {c0}")
-    #     print(f"[DEBUG] c1 value: {c1}")
-
-    #     logits = logits[:, c0[0]:c1[0], c0[1]:c1[1], :]
-    #     print(f"[DEBUG] logits shape after slicing: {logits.shape}")
-
-    #     logits = tf.transpose(logits, [3, 1, 2, 0])
-    #     output = tf.reshape(logits, (1, np.prod(logits.shape)))
-    #     print(f"[DEBUG] Final output shape: {output.shape}")
-
-    #     if apply_softmax:
-    #         output = np.float32(output).reshape(logits.shape[1:])
-    #     return output
 
 
 
