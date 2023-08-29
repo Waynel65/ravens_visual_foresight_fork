@@ -10,6 +10,7 @@ import tensorflow_addons as tfa
 from ravens.models_gctn.resnet import ResNet43_8s
 from ravens.utils_gctn import utils
 
+import pdb
 
 class Attention:
     """Daniel: attention model implemented as an hourglass FCN.
@@ -51,6 +52,8 @@ class Attention:
         in_img.shape: (320, 160, 6)
         input_data.shape: (320, 320, 6), then (None, 320, 320, 6)
         """
+
+        pdb.set_trace()
         input_data = np.pad(in_img, self.padding, mode='constant')
         input_data = self.preprocess(input_data)
         input_shape = (1,) + input_data.shape
