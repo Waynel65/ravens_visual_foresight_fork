@@ -53,7 +53,7 @@ class Attention:
         input_data.shape: (320, 320, 6), then (None, 320, 320, 6)
         """
 
-        pdb.set_trace()
+        # pdb.set_trace()
         input_data = np.pad(in_img, self.padding, mode='constant')
         input_data = self.preprocess(input_data)
         input_shape = (1,) + input_data.shape
