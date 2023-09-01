@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 from ravens.models_gctn import ResNet43_8s
 from ravens.utils_gctn import utils
 
+import pdb
+
 
 class TransportGoal:
     """Daniel: Transporter for the placing module, with goal images.
@@ -63,6 +65,7 @@ class TransportGoal:
         otherwise we have to do a forward pass, then call tf.multiply, then
         do another forward pass, which splits up the computation.
         """
+        pdb.set_trace()
         assert in_img.shape == goal_img.shape, f'{in_img.shape}, {goal_img.shape}'
 
         # input image --> TF tensor
