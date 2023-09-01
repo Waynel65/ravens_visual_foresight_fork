@@ -79,9 +79,9 @@ class Attention:
         logits = tfa.image.transform(logits, rvecs, interpolation='NEAREST')
         c0 = self.padding[:2, 0]
         c1 = c0 + in_img.shape[:2]
-        logits = logits[:, c0[0]:c1[0], c0[1]:c1[1], :]
+        logits = logits[:, c0[0]:c1[0], c0[1]:c1[1], :] # (1,160,160,1)
 
-        logits = tf.transpose(logits, [3, 1, 2, 0])
+        logits = tf.transpose(logits, [3, 1, 2, 0]) # still (1,160,160,1) but batch is swapped with channel
         output = tf.reshape(logits, (1, np.prod(logits.shape)))
         if apply_softmax:
             output = np.float32(output).reshape(logits.shape[1:])
