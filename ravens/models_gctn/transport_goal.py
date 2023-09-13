@@ -65,39 +65,47 @@ class TransportGoal:
         otherwise we have to do a forward pass, then call tf.multiply, then
         do another forward pass, which splits up the computation.
         """
-        pdb.set_trace()
         assert in_img.shape == goal_img.shape, f'{in_img.shape}, {goal_img.shape}'
 
         # input image --> TF tensor
-        input_unproc = np.pad(in_img, self.padding, mode='constant')    # (384,224,6)
-        input_data = self.preprocess(input_unproc.copy())               # (384,224,6)
+        input_unproc = np.pad(in_img, self.padding, mode='constant')
+        input_data = self.preprocess(input_unproc.copy())               
         input_shape = (1,) + input_data.shape
-        input_data = input_data.reshape(input_shape)                    # (1,384,224,6)
-        in_tensor = tf.convert_to_tensor(input_data, dtype=tf.float32)  # (1,384,224,6)
+        input_data = input_data.reshape(input_shape)                    
+        in_tensor = tf.convert_to_tensor(input_data, dtype=tf.float32)  
 
         # goal image --> TF tensor
-        goal_unproc = np.pad(goal_img, self.padding, mode='constant')   # (384,224,6)
-        goal_data = self.preprocess(goal_unproc.copy())                 # (384,224,6)
+        goal_unproc = np.pad(goal_img, self.padding, mode='constant')   
+        goal_data = self.preprocess(goal_unproc.copy())                 
         goal_shape = (1,) + goal_data.shape
-        goal_data = goal_data.reshape(goal_shape)                       # (1,384,224,6)
-        goal_tensor = tf.convert_to_tensor(goal_data, dtype=tf.float32) # (1,384,224,6)
+        goal_data = goal_data.reshape(goal_shape)                       
+        goal_tensor = tf.convert_to_tensor(goal_data, dtype=tf.float32) 
+
+        pdb.set_trace()
 
         # Get SE2 rotation vectors for cropping.
         pivot = np.array([p[1], p[0]]) + self.pad_size
         rvecs = self.get_se2(self.num_rotations, pivot)
 
-        # Forward pass through three separate FCNs. All logits will be: (1,384,224,3).
-        in_logits, kernel_nocrop_logits, goal_logits = \
-                    self.model([in_tensor, in_tensor, goal_tensor])
+        # Forward pass through three separate FCNs.
+        # in_logits, kernel_nocrop_logits, goal_logits = \
+        #             self.model([in_tensor, in_tensor, goal_tensor])
+        # ! hardcoded model output
+        dummy_in_logits = tf.ones((1,224,224,3)) # filled with ones
+        dummy_kernel_nocrop_logits = tf.ones((1,224,224,3)) * 2.0 # filled with twos
+        dummy_goal_logits = tf.ones((1,224,224,3)) * 3.0 # filled with threes
+
+        # Replace the model's output with dummy tensors for debugging
+        in_logits, kernel_nocrop_logits, goal_logits = dummy_in_logits, dummy_kernel_nocrop_logits, dummy_goal_logits
 
         # Use features from goal logits and combine with input and kernel.
         goal_x_in_logits     = tf.multiply(goal_logits, in_logits)
         goal_x_kernel_logits = tf.multiply(goal_logits, kernel_nocrop_logits)
 
         # Crop the kernel_logits about the picking point and get rotations.
-        crop = tf.identity(goal_x_kernel_logits)                            # (1,384,224,3)
-        crop = tf.repeat(crop, repeats=self.num_rotations, axis=0)          # (24,384,224,3)
-        crop = tfa.image.transform(crop, rvecs, interpolation='NEAREST')    # (24,384,224,3)
+        crop = tf.identity(goal_x_kernel_logits)                            
+        crop = tf.repeat(crop, repeats=self.num_rotations, axis=0)          
+        crop = tfa.image.transform(crop, rvecs, interpolation='NEAREST')    
         kernel = crop[:,
                       p[0]:(p[0] + self.crop_size),
                       p[1]:(p[1] + self.crop_size),
@@ -105,6 +113,7 @@ class TransportGoal:
         assert kernel.shape == (self.num_rotations, self.crop_size, self.crop_size, self.odim)
 
         # Cross-convolve `in_x_goal_logits`. Padding kernel: (24,64,64,3) --> (65,65,3,24).
+        # (batch, height, width, channel) -> 
         kernel_paddings = tf.constant([[0, 0], [0, 1], [0, 1], [0, 0]])
         kernel = tf.pad(kernel, kernel_paddings, mode='CONSTANT')
         kernel = tf.transpose(kernel, [1, 2, 3, 0])
