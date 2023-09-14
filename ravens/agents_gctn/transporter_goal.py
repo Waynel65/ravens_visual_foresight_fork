@@ -296,6 +296,7 @@ class TransporterAgent:
             transport = self.transport_model.forward(img_curr, img_goal, p0_pixel)
         else:
             transport = self.transport_model.forward(input_image, p0_pixel)
+        pdb.set_trace()
         argmax = np.argmax(transport)
         argmax = np.unravel_index(argmax, shape=transport.shape)
         p1_pixel = argmax[:2]
