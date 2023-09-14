@@ -90,6 +90,13 @@ class TransportGoal:
         # Forward pass through three separate FCNs.
         in_logits, kernel_nocrop_logits, goal_logits = \
                     self.model([in_tensor, in_tensor, goal_tensor])
+        in_logits_np = in_logits.numpy() # Convert the tensor to a numpy array
+        kernel_nocrop_logits_np = kernel_nocrop_logits.numpy()
+        goal_logits_np = goal_logits.numpy()
+        np.save('in_logits_tf.npy', in_logits_np) # Save to disk
+        np.save('kernel_nocrop_logits_tf.npy', kernel_nocrop_logits_np)
+        np.save('goal_logits_tf.npy', goal_logits_np)
+        
         # # ! hardcoded model output
         # dummy_in_logits = tf.ones((1,224,224,3)) # filled with ones
         # dummy_kernel_nocrop_logits = tf.ones((1,224,224,3)) * 2.0 # filled with twos
