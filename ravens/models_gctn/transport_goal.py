@@ -88,15 +88,15 @@ class TransportGoal:
         rvecs = self.get_se2(self.num_rotations, pivot)
 
         # Forward pass through three separate FCNs.
-        # in_logits, kernel_nocrop_logits, goal_logits = \
-        #             self.model([in_tensor, in_tensor, goal_tensor])
-        # ! hardcoded model output
-        dummy_in_logits = tf.ones((1,224,224,3)) # filled with ones
-        dummy_kernel_nocrop_logits = tf.ones((1,224,224,3)) * 2.0 # filled with twos
-        dummy_goal_logits = tf.ones((1,224,224,3)) * 3.0 # filled with threes
+        in_logits, kernel_nocrop_logits, goal_logits = \
+                    self.model([in_tensor, in_tensor, goal_tensor])
+        # # ! hardcoded model output
+        # dummy_in_logits = tf.ones((1,224,224,3)) # filled with ones
+        # dummy_kernel_nocrop_logits = tf.ones((1,224,224,3)) * 2.0 # filled with twos
+        # dummy_goal_logits = tf.ones((1,224,224,3)) * 3.0 # filled with threes
 
-        # Replace the model's output with dummy tensors for debugging
-        in_logits, kernel_nocrop_logits, goal_logits = dummy_in_logits, dummy_kernel_nocrop_logits, dummy_goal_logits
+        # # Replace the model's output with dummy tensors for debugging
+        # in_logits, kernel_nocrop_logits, goal_logits = dummy_in_logits, dummy_kernel_nocrop_logits, dummy_goal_logits
 
         # Use features from goal logits and combine with input and kernel.
         goal_x_in_logits     = tf.multiply(goal_logits, in_logits)
