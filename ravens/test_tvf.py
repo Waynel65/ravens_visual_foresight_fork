@@ -59,7 +59,7 @@ def main(unused_argv):
     tf.config.experimental.enable_op_determinism()
 
     # Model path.
-    test_total_steps = 20000
+    test_total_steps = 8000
     dynamics_model_path = f'./dynamics_models/vf_{FLAGS.n_demos}/pp-dynamics-task6-demo{FLAGS.n_demos}-resnet_lite-seed{train_run}-step60000-ckpt-{FLAGS.dynamics_total_steps}.h5'
     # attention_model_path = f'./gctn_models/GCTN-Multi-transporter-goal-{FLAGS.n_demos}-{train_run}-rots-36-fin_g/attention-ckpt-{FLAGS.gctn_total_steps}.h5'
     # transport_model_path = f'./gctn_models/GCTN-Multi-transporter-goal-{FLAGS.n_demos}-{train_run}-rots-36-fin_g/transport-ckpt-{FLAGS.gctn_total_steps}.h5'
